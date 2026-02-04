@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureVault - Schéma d'Architecture</title>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 1.2em;
+        }
+
+        .info-box {
+            background: #ecf0f1;
+            border-left: 4px solid #3498db;
+            padding: 20px;
+            margin-bottom: 30px;
+            border-radius: 5px;
+        }
+
+        .info-box h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .info-box p {
+            color: #34495e;
+            line-height: 1.6;
+        }
+
+        .legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .legend-text {
+            font-size: 0.9em;
+            color: #2c3e50;
+        }
+
+        #diagram {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            overflow-x: auto;
+        }
+
+        .security-features {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .feature-card h4 {
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        .feature-card ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .feature-card li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .feature-card li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 SecureVault</h1>
+        <div class="subtitle">Architecture de sécurité - Service de partage de fichiers éphémères chiffrés</div>
+
+        <div class="info-box">
+            <h3>📋 Description de l'architecture</h3>
+            <p>
+                Ce schéma illustre l'architecture complète de SecureVault, un service de partage de fichiers 
+                éphémères avec chiffrement de bout en bout AES-256-GCM. L'architecture suit les principes 
+                de sécurité "zero-knowledge", "defense in depth", et "shift-left security".
+            </p>
+        </div>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: #bbdefb;"></div>
+                <div class="legend-text">Client & Chiffrement</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ffe082;"></div>
+                <div class="legend-text">Couche Transport (HTTPS/TLS)</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #fff59d;"></div>
+                <div class="legend-text">Reverse Proxy & WAF</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #a5d6a7;"></div>
+                <div class="legend-text">Backend API</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #f48fb1;"></div>
+                <div class="legend-text">Stockage</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #9575cd;"></div>
+                <div class="legend-text">Monitoring & Logs</div>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: #ff8a65;"></div>
+                <div class="legend-text">Pipeline DevSecOps</div>
+            </div>
+        </div>
+
+        <div id="diagram">
+            <div class="mermaid">
+graph TB
+    subgraph "Client (Navigateur)"
+        A[Utilisateur] --> B[Interface React.js]
+        B --> C[Module de Chiffrement<br/>AES-256-GCM<br/>Web Crypto API]
+        C --> D[Gestion des Clés<br/>Génération CSPRNG]
+    end
+
+    subgraph "Couche Transport"
+        E[HTTPS/TLS 1.3<br/>Certificat SSL]
+        F[Headers Sécurité<br/>HSTS, CSP, X-Frame-Options]
+    end
+
+    subgraph "Reverse Proxy"
+        G[Nginx]
+        G --> H[Rate Limiting<br/>10 req/min par IP]
+        G --> I[WAF<br/>ModSecurity]
+    end
+
+    subgraph "Backend (Node.js/Express)"
+        J[API REST]
+        J --> K[Validation Entrées<br/>Sanitization]
+        K --> L[Contrôleur Upload]
+        K --> M[Contrôleur Download]
+        L --> N[Générateur UUID v4]
+        M --> O[Vérification Expiration]
+    end
+
+    subgraph "Stockage"
+        P[(PostgreSQL<br/>Métadonnées)]
+        Q[Système de Fichiers<br/>Fichiers Chiffrés]
+    end
+
+    subgraph "Tâches Planifiées"
+        R[Cron Job<br/>Nettoyage Fichiers Expirés]
+    end
+
+    subgraph "Monitoring & Logs"
+        S[Prometheus<br/>Métriques]
+        T[Grafana<br/>Dashboards]
+        U[ELK Stack<br/>Logs Centralisés]
+    end
+
+    subgraph "Pipeline DevSecOps"
+        V[GitHub Actions]
+        V --> W[npm audit<br/>Scan Dépendances]
+        V --> X[SonarQube<br/>SAST]
+        V --> Y[Trivy<br/>Scan Containers]
+        V --> Z[OWASP ZAP<br/>DAST]
+    end
+
+    %% Flux d'upload
+    B -->|1. Fichier sélectionné| C
+    C -->|2. Chiffrement AES-256| D
+    D -->|3. Clé générée| B
+    B -->|4. Fichier chiffré + métadonnées| E
+    E --> G
+    G --> J
+    J --> K
+    K --> L
+    L --> N
+    N -->|5. UUID| L
+    L -->|6. Stockage fichier| Q
+    L -->|7. Métadonnées| P
+    P -->|8. Confirmation| L
+    L -->|9. Lien unique| J
+    J -->|10. Réponse| G
+    G -->|11. Lien avec clé (#)| E
+    E -->|12. Affichage lien| B
+
+    %% Flux de download
+    B -->|1. Accès lien| E
+    E --> G
+    G --> J
+    J --> K
+    K --> M
+    M -->|2. Vérification UUID| P
+    P -->|3. Métadonnées| M
+    M -->|4. Vérification expiration| O
+    O -->|5. OK| M
+    M -->|6. Récupération fichier| Q
+    Q -->|7. Fichier chiffré| M
+    M -->|8. Incrémentation compteur| P
+    M -->|9. Fichier chiffré| J
+    J --> G
+    G --> E
+    E -->|10. Réception| B
+    B -->|11. Déchiffrement avec clé| C
+    C -->|12. Fichier déchiffré| A
+
+    %% Nettoyage
+    R -->|Scan périodique| P
+    P -->|Fichiers expirés| R
+    R -->|Suppression| Q
+    R -->|Suppression métadonnées| P
+
+    %% Monitoring
+    J -.->|Métriques| S
+    S -.->|Visualisation| T
+    J -.->|Logs| U
+
+    %% DevSecOps
+    V -.->|Déploiement validé| J
+
+    style A fill:#e1f5ff
+    style B fill:#bbdefb
+    style C fill:#90caf9
+    style D fill:#64b5f6
+    style E fill:#ffecb3
+    style F fill:#ffe082
+    style G fill:#fff9c4
+    style H fill:#fff59d
+    style I fill:#fff176
+    style J fill:#c8e6c9
+    style K fill:#a5d6a7
+    style L fill:#81c784
+    style M fill:#81c784
+    style N fill:#66bb6a
+    style O fill:#66bb6a
+    style P fill:#f8bbd0
+    style Q fill:#f48fb1
+    style R fill:#ce93d8
+    style S fill:#b39ddb
+    style T fill:#9575cd
+    style U fill:#7e57c2
+    style V fill:#ffccbc
+    style W fill:#ffab91
+    style X fill:#ff8a65
+    style Y fill:#ff7043
+    style Z fill:#ff5722
+            </div>
+        </div>
+
+        <div class="security-features">
+            <div class="feature-card">
+                <h4>🔒 Chiffrement</h4>
+                <ul>
+                    <li>AES-256-GCM côté client</li>
+                    <li>Web Crypto API</li>
+                    <li>Clés jamais transmises au serveur</li>
+                    <li>Zero-knowledge encryption</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🛡️ Protection Transport</h4>
+                <ul>
+                    <li>HTTPS/TLS 1.3 obligatoire</li>
+                    <li>HSTS activé</li>
+                    <li>Perfect Forward Secrecy</li>
+                    <li>Headers de sécurité HTTP</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🚦 Rate Limiting & WAF</h4>
+                <ul>
+                    <li>10 requêtes/min par IP</li>
+                    <li>ModSecurity WAF</li>
+                    <li>Protection DDoS</li>
+                    <li>Blocage patterns malveillants</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>✅ Validation & Sanitization</h4>
+                <ul>
+                    <li>Validation stricte des entrées</li>
+                    <li>Sanitization des données</li>
+                    <li>Protection injection SQL</li>
+                    <li>Protection XSS/CSRF</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>⏰ Gestion Expiration</h4>
+                <ul>
+                    <li>Suppression après X lectures</li>
+                    <li>Suppression après durée définie</li>
+                    <li>Nettoyage automatique (cron)</li>
+                    <li>Suppression sécurisée</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>📊 Monitoring & Logs</h4>
+                <ul>
+                    <li>Prometheus pour métriques</li>
+                    <li>Grafana pour dashboards</li>
+                    <li>ELK Stack pour logs</li>
+                    <li>Alerting temps réel</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🔄 Pipeline DevSecOps</h4>
+                <ul>
+                    <li>Scans automatiques (npm audit)</li>
+                    <li>SAST avec SonarQube</li>
+                    <li>Scan containers avec Trivy</li>
+                    <li>DAST avec OWASP ZAP</li>
+                </ul>
+            </div>
+
+            <div class="feature-card">
+                <h4>🎯 Sécurité en Profondeur</h4>
+                <ul>
+                    <li>Defense in depth</li>
+                    <li>Principe moindre privilège</li>
+                    <li>Séparation des responsabilités</li>
+                    <li>Fail secure</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="info-box" style="margin-top: 30px;">
+            <h3>📈 Flux de données</h3>
+            <p><strong>Upload :</strong> Fichier → Chiffrement client → Upload HTTPS → Validation → Stockage → Génération lien unique</p>
+            <p><strong>Download :</strong> Accès lien → Vérification expiration → Récupération fichier chiffré → Déchiffrement client → Incrémentation compteur → Suppression si limite atteinte</p>
+        </div>
+    </div>
+
+    <script>
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'default',
+            flowchart: {
+                useMaxWidth: true,
+                htmlLabels: true,
+                curve: 'basis'
+            }
+        });
+    </script>
+</body>
+</html>
